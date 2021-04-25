@@ -1,0 +1,27 @@
+{
+  "name": "ams-backend",
+  "version": "1.0.0",
+  "description": "Backend for attendance management system",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rahulkannan/AMS-Backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rahulkannan/AMS-Backend/issues"
+  },
+  "homepage": "https://github.com/rahulkannan/AMS-Backend#readme",
+  "dependencies": {
+    "fastify": "^3.15.0",
+    "knex": "^0.95.4",
+    "mysql2": "^2.2.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
