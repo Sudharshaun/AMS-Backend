@@ -1,15 +1,35 @@
 const connection = require("./db/model");
-console.log("inside dockers");
+require("dotenv").config();
 const fastify = require('fastify')({
     logger: true
 });
+const institution = require('./institution/institution')
 
-fastify.get('/', (request, reply) => {
-    console.log("Inside Route");
-    reply.send({ hello: 'world' })
+
+fastify.get('/institution/:id', async (request, reply) => {
+    let response = await institution.getInstitution(request.params.id);
+    return response;
 })
 
-fastify.listen(3000, (err, address) => {
-    if (err) throw err
-    fastify.log.info(`server listening on ${address}`)
+const institutionSchema = {
+    body: {
+        name: { type: 'string' },
+        address: { type: 'string' },
+        email: { type: 'string' },
+    },
+    response: {
+        200: {
+            type: 'object',
+            properties: {
+                status: { type: 'string' }
+            }
+        }
+    }
+}
+
+fastify.post('/institution', institutionSchema, async (request, reply) => {
+    let response = await institution.addInstitution(request.body);
+    reply.send(response);
 })
+
+fastify.listen(3000);

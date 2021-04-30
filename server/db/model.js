@@ -2,14 +2,23 @@ const mysql = require('mysql2');
 const config = require('../config');
 const connection = mysql.createConnection(config.mysqlConfig.mysql);
 
+console.log('Running Migration');
+
 connection.connect(err => {
-  if (err) throw err;
-  console.log('DataBase Connected');
+    if (err) throw err;
+    console.log('DataBase Connected');
 })
 
+const creatAMS =
+    `CREATE DATABASE IF NOT EXISTS ams`;
+
+connection.query(creatAMS, function (err, result) {
+    if (err) throw err;
+});
+
 const createInstitution =
-  `CREATE TABLE IF NOT EXISTS ams.institution (
-    id INT NOT NULL ,
+    `CREATE TABLE IF NOT EXISTS ams.institution (
+    id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(45) NOT NULL,
     address VARCHAR(45) NOT NULL,
     email VARCHAR(45) NOT NULL,
@@ -17,11 +26,11 @@ const createInstitution =
   ENGINE = InnoDB;`
 
 connection.query(createInstitution, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 });
 
 const createStudent = `CREATE TABLE IF NOT EXISTS ams.student (
-    id INT NOT NULL ,
+    id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(45) NOT NULL,
     institutionid INT NOT NULL,
     PRIMARY KEY (id),
@@ -34,11 +43,11 @@ const createStudent = `CREATE TABLE IF NOT EXISTS ams.student (
   ENGINE = InnoDB;`
 
 connection.query(createStudent, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 });
 
 const createClass = `CREATE TABLE IF NOT EXISTS ams.class (
-    id INT NOT NULL ,
+    id INT NOT NULL AUTO_INCREMENT,
     institutionid INT NOT NULL,
     name VARCHAR(45) NOT NULL,
     year INT NOT NULL,
@@ -52,11 +61,11 @@ const createClass = `CREATE TABLE IF NOT EXISTS ams.class (
   ENGINE = InnoDB;`
 
 connection.query(createClass, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 });
 
 const createStaff = `CREATE TABLE IF NOT EXISTS ams.staff (
-    id INT NOT NULL ,
+    id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(45) NOT NULL,
     email VARCHAR(45) NOT NULL,
     phonenumber INT NOT NULL,
@@ -73,11 +82,11 @@ const createStaff = `CREATE TABLE IF NOT EXISTS ams.staff (
   ENGINE = InnoDB;
   `
 connection.query(createStaff, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 });
 
 const createSubject = `CREATE TABLE IF NOT EXISTS ams.subject (
-    id INT NOT NULL ,
+    id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(45) NOT NULL,
     classid INT NOT NULL,
     staffid INT NULL,
@@ -96,70 +105,11 @@ const createSubject = `CREATE TABLE IF NOT EXISTS ams.subject (
   ENGINE = InnoDB;`
 
 connection.query(createSubject, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 });
-
-const createExam = `CREATE TABLE IF NOT EXISTS ams.exam (
-    id INT NOT NULL ,
-    name VARCHAR(45) NOT NULL,
-    exam VARCHAR(45) NOT NULL,
-    institutionid INT NULL,
-    PRIMARY KEY (id),
-    INDEX institutioinid_idx (institutionid ASC),
-    CONSTRAINT exam_fk1
-      FOREIGN KEY (institutionid)
-      REFERENCES ams.institution (id)
-      ON DELETE CASCADE
-      ON UPDATE NO ACTION)
-  ENGINE = InnoDB;
-  `
-
-connection.query(createExam, function (err, result) {
-  if (err) throw err;
-});
-
-const createMark = `CREATE TABLE IF NOT EXISTS ams.mark (
-    id INT NOT NULL ,
-    mark INT NOT NULL,
-    total INT NOT NULL,
-    percentage INT NOT NULL,
-    studentid INT NOT NULL,
-    subjectid INT NOT NULL,
-    institutionid INT NOT NULL,
-    classid INT NOT NULL,
-    INDEX institutionid_idx (institutionid ASC),
-    PRIMARY KEY (id),
-    INDEX studentid_fk2_idx (studentid ASC),
-    INDEX mark_fk4_idx (classid ASC),
-    CONSTRAINT mark_fk1
-      FOREIGN KEY (institutionid)
-      REFERENCES ams.institution (id)
-      ON DELETE CASCADE
-      ON UPDATE NO ACTION,
-    CONSTRAINT mark_fk2
-      FOREIGN KEY (studentid)
-      REFERENCES ams.student (id)
-      ON DELETE CASCADE
-      ON UPDATE NO ACTION,
-    CONSTRAINT mark_fk3
-      FOREIGN KEY (subjectid)
-      REFERENCES ams.subject (id)
-      ON DELETE CASCADE
-      ON UPDATE NO ACTION,
-    CONSTRAINT mark_fk4
-      FOREIGN KEY (classid)
-      REFERENCES ams.class (id)
-      ON DELETE CASCADE
-      ON UPDATE NO ACTION)
-  ENGINE = InnoDB;
-  `
-connection.query(createMark, function (err, result) {
-  if (err) throw err;
-});
-
 
 const createParent = `CREATE TABLE IF NOT EXISTS ams.parent (
-    id INT NOT NULL ,
+    id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(45) NOT NULL,
     phonenumber INT NOT NULL,
     email VARCHAR(45) NOT NULL,
@@ -177,11 +127,11 @@ const createParent = `CREATE TABLE IF NOT EXISTS ams.parent (
   ENGINE = InnoDB;`
 
 connection.query(createParent, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 });
 
 const createParentStudentMapping = `CREATE TABLE IF NOT EXISTS ams.parentstudentmapping (
-    id INT NOT NULL ,
+    id INT NOT NULL AUTO_INCREMENT,
     parentid INT NOT NULL,
     studentid INT NOT NULL,
     institutionid INT NOT NULL,
@@ -208,7 +158,7 @@ const createParentStudentMapping = `CREATE TABLE IF NOT EXISTS ams.parentstudent
 
 
 connection.query(createParentStudentMapping, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 });
 
 const createAdmin = `CREATE TABLE IF NOT EXISTS ams.admin (
@@ -230,7 +180,7 @@ const createAdmin = `CREATE TABLE IF NOT EXISTS ams.admin (
   `
 
 connection.query(createAdmin, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 })
 
 const createTimetable = `CREATE TABLE IF NOT EXISTS ams.timetable (
@@ -262,7 +212,7 @@ const createTimetable = `CREATE TABLE IF NOT EXISTS ams.timetable (
   ENGINE = InnoDB;`
 
 connection.query(createTimetable, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 })
 
 const createAttendance = `CREATE TABLE IF NOT EXISTS ams.attendance (
@@ -309,7 +259,7 @@ const createAttendance = `CREATE TABLE IF NOT EXISTS ams.attendance (
   ENGINE = InnoDB;`
 
 connection.query(createAttendance, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 })
 
 const createStudentClassMapping = `CREATE TABLE IF NOT EXISTS ams.studentclassmapping (
@@ -332,9 +282,9 @@ const createStudentClassMapping = `CREATE TABLE IF NOT EXISTS ams.studentclassma
   ENGINE = InnoDB;
   `
 connection.query(createStudentClassMapping, function (err, result) {
-  if (err) throw err;
+    if (err) throw err;
 })
 
 module.exports = {
-  connection
+    connection
 }
