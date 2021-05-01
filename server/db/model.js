@@ -22,7 +22,7 @@ const createInstitution =
     name VARCHAR(45) NOT NULL,
     address VARCHAR(45) NOT NULL,
     email VARCHAR(45) NOT NULL,
-    createdByUserId INT NOT NULL,
+    owneruserid INT NOT NULL,
     PRIMARY KEY (id, email))
   ENGINE = InnoDB;`
 

@@ -2,7 +2,13 @@
 const knex = require('../db/sql-connection');
 
 const addInstitution = async (data) => {
-    let query = await knex('institution').insert(data).then(() => console.log("data inserted"))
+    let insertData = {
+        name: data.name,
+        address: data.address,
+        email: data.email,
+        owneruserid: data.userid,
+    }
+    let query = await knex('institution').insert(insertData).then(() => console.log("data inserted"))
         .catch((err) => { console.log(err); throw err })
     return { status: 'success' }
 }
