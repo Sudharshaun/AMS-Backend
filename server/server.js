@@ -1,63 +1,23 @@
 const connection = require("./db/model");
 require("dotenv").config();
-const fastify = require('fastify')({
-    logger: true
-});
 const institution = require('./institution/institution')
 const user = require('../server/user/auth')
 
 
-fastify.get('/user/:id', async (request, reply) => {
-    let response = await user.getUser(request.params.id);
-    return response;
-})
+const express = require('express')
+const router = express.Router();
+const app = express()
+const port = 3000
 
-const userSchema = {
-    body: {
-        name: { type: 'string' },
-        email: { type: 'string' },
-        password: { type: 'string' },
-    },
-    response: {
-        200: {
-            type: 'object',
-            properties: {
-                status: { type: 'string' }
-            }
-        }
-    }
-}
+app.use(express.json());
 
-fastify.post('/user', userSchema, async (request, reply) => {
-    let response = await user.addUser(request.body);
-    reply.send(response);
-})
+app.get('/user?id',  user.getUser)
+
+app.post('/user', user.addUser)
 
 
-fastify.get('/institution/:id', async (request, reply) => {
-    let response = await institution.getInstitution(request.params.id);
-    return response;
-})
+app.get('/institution/:id', institution.getInstitution)
 
-const institutionSchema = {
-    body: {
-        name: { type: 'string' },
-        address: { type: 'string' },
-        email: { type: 'string' },
-    },
-    response: {
-        200: {
-            type: 'object',
-            properties: {
-                status: { type: 'string' }
-            }
-        }
-    }
-}
+app.post('/institution', institution.addInstitution)
 
-fastify.post('/institution', institutionSchema, async (request, reply) => {
-    let response = await institution.addInstitution(request.body);
-    reply.send(response);
-})
-
-fastify.listen(3000);
+app.listen(port);

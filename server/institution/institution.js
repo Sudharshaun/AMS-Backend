@@ -1,23 +1,24 @@
 
 const knex = require('../db/sql-connection');
 
-const addInstitution = async (data) => {
+async function addInstitution  (req, res) {
     let insertData = {
-        name: data.name,
-        address: data.address,
-        email: data.email,
-        owneruserid: data.userid,
+        name: req.body.name,
+        address: req.body.address,
+        email: req.body.email,
+        owneruserid: req.body.userid,
     }
     let query = await knex('institution').insert(insertData).then(() => console.log("data inserted"))
         .catch((err) => { console.log(err); throw err })
-    return { status: 'success' }
+    res.status(201).json({ status: 'success' });
 }
 
-const getInstitution = async (id) => {
+async function getInstitution (req, res) {
+    let id = req.params.id;
     let query = await knex.from('institution').select("*").where('id', '=', id).then((row) => {
         return row;
     })
-    return query;
+    res.status(201).json(query);
 }
 
 module.exports = {

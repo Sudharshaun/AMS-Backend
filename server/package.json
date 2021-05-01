@@ -18,7 +18,7 @@
   "homepage": "https://github.com/rahulkannan/AMS-Backend#readme",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "fastify": "^3.15.0",
+    "express": "^4.17.1",
     "knex": "^0.95.4",
     "mysql2": "^2.2.5"
   },
