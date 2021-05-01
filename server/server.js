@@ -11,7 +11,7 @@ const port = 3000
 
 app.use(express.json());
 
-app.get('/user?id',  user.getUser)
+app.get('/user/:id',  user.getUser)
 
 app.post('/user', user.addUser)
 

@@ -16,20 +16,6 @@ connection.query(creatAMS, function (err, result) {
     if (err) throw err;
 });
 
-const createInstitution =
-    `CREATE TABLE IF NOT EXISTS ams.institution (
-    id INT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(45) NOT NULL,
-    address VARCHAR(45) NOT NULL,
-    email VARCHAR(45) NOT NULL,
-    owneruserid INT NOT NULL,
-    PRIMARY KEY (id, email))
-  ENGINE = InnoDB;`
-
-connection.query(createInstitution, function (err, result) {
-    if (err) throw err;
-});
-
 const user =
     `CREATE TABLE IF NOT EXISTS ams.user (
     id INT NOT NULL AUTO_INCREMENT,
@@ -47,6 +33,26 @@ connection.query(user, function (err, result) {
     if (err) throw err;
 });
 
+const createInstitution =
+    `CREATE TABLE IF NOT EXISTS ams.institution (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(45) NOT NULL,
+    address VARCHAR(45) NOT NULL,
+    email VARCHAR(45) NOT NULL,
+    owneruserid INT NOT NULL,
+    PRIMARY KEY (id, email),
+    CONSTRAINT user_fk2
+        FOREIGN KEY (owneruserid)
+        REFERENCES ams.user (id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION)
+  ENGINE = InnoDB;` 
+
+connection.query(createInstitution, function (err, result) {
+    if (err) throw err;
+});
+
+
 const institutionUserMapping = `CREATE TABLE IF NOT EXISTS ams.institutionusermapping (
     id INT NOT NULL AUTO_INCREMENT,
     institutionid INT NOT NULL,
@@ -59,7 +65,7 @@ const institutionUserMapping = `CREATE TABLE IF NOT EXISTS ams.institutionuserma
       REFERENCES ams.institution (id)
       ON DELETE CASCADE
       ON UPDATE NO ACTION,
-    CONSTRAINT user_fk2
+    CONSTRAINT institute_user_fk2
       FOREIGN KEY (userid)
       REFERENCES ams.user (id)
       ON DELETE CASCADE

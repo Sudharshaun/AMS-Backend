@@ -4,8 +4,8 @@ const knex = require('../db/sql-connection');
 const addUser = async (req, res) => {
     let insertData = {
         name: req.body.name,
-        address: req.body.email,
-        email: req.body.password
+        email: req.body.email,
+        password: req.body.password,
     }
     let query = await knex('user').insert(insertData).then(() => console.log("data inserted"))
         .catch((err) => { console.log(err); throw err })
