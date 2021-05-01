@@ -22,6 +22,7 @@ const createInstitution =
     name VARCHAR(45) NOT NULL,
     address VARCHAR(45) NOT NULL,
     email VARCHAR(45) NOT NULL,
+    createdByUserId INT NOT NULL,
     PRIMARY KEY (id, email))
   ENGINE = InnoDB;`
 
@@ -29,22 +30,68 @@ connection.query(createInstitution, function (err, result) {
     if (err) throw err;
 });
 
-const createStudent = `CREATE TABLE IF NOT EXISTS ams.student (
+const user =
+    `CREATE TABLE IF NOT EXISTS ams.user (
     id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(45) NOT NULL,
+    email VARCHAR(45) NOT NULL,
+    password VARCHAR(45) NOT NULL,
+    phonenumber INT,
+    age TINYINT(10),
+    address VARCHAR(45),
+    gender TINYINT(10),
+    PRIMARY KEY (id, email))
+  ENGINE = InnoDB;`
+
+connection.query(user, function (err, result) {
+    if (err) throw err;
+});
+
+const institutionUserMapping = `CREATE TABLE IF NOT EXISTS ams.institutionusermapping (
+    id INT NOT NULL AUTO_INCREMENT,
     institutionid INT NOT NULL,
+    userid INT NOT NULL,
     PRIMARY KEY (id),
     INDEX institutionid_idx (institutionid ASC),
-    CONSTRAINT student_fk2
+    INDEX userid_idx (userid ASC),
+    CONSTRAINT instituteuser_fk1
       FOREIGN KEY (institutionid)
       REFERENCES ams.institution (id)
+      ON DELETE CASCADE
+      ON UPDATE NO ACTION,
+    CONSTRAINT user_fk2
+      FOREIGN KEY (userid)
+      REFERENCES ams.user (id)
       ON DELETE CASCADE
       ON UPDATE NO ACTION)
   ENGINE = InnoDB;`
 
-connection.query(createStudent, function (err, result) {
+connection.query(institutionUserMapping, function (err, result) {
     if (err) throw err;
 });
+
+const createAdmin = `CREATE TABLE IF NOT EXISTS ams.admin (
+    id INT NOT NULL ,
+    userid INT NOT NULL,
+    institutionid INT NOT NULL,
+    PRIMARY KEY (id),
+    INDEX institutionid_idx (institutionid ASC),
+    CONSTRAINT admin_fk1
+      FOREIGN KEY (institutionid)
+      REFERENCES ams.institution (id)
+      ON DELETE CASCADE
+      ON UPDATE NO ACTION,
+    CONSTRAINT admin_fk2
+      FOREIGN KEY (userid)
+      REFERENCES ams.user (id)
+      ON DELETE CASCADE
+      ON UPDATE NO ACTION)
+  ENGINE = InnoDB;
+  `
+connection.query(createAdmin, function (err, result) {
+    if (err) throw err;
+})
+
 
 const createClass = `CREATE TABLE IF NOT EXISTS ams.class (
     id INT NOT NULL AUTO_INCREMENT,
@@ -64,42 +111,21 @@ connection.query(createClass, function (err, result) {
     if (err) throw err;
 });
 
-const createStaff = `CREATE TABLE IF NOT EXISTS ams.staff (
-    id INT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(45) NOT NULL,
-    email VARCHAR(45) NOT NULL,
-    phonenumber INT NOT NULL,
-    age TINYINT(10) NOT NULL,
-    gender TINYINT(10) NOT NULL,
-    institutionid INT NOT NULL,
-    PRIMARY KEY (id),
-    INDEX institutionid_idx (institutionid ASC),
-    CONSTRAINT staff_fk1
-      FOREIGN KEY (institutionid)
-      REFERENCES ams.institution (id)
-      ON DELETE CASCADE
-      ON UPDATE NO ACTION)
-  ENGINE = InnoDB;
-  `
-connection.query(createStaff, function (err, result) {
-    if (err) throw err;
-});
-
 const createSubject = `CREATE TABLE IF NOT EXISTS ams.subject (
     id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(45) NOT NULL,
     classid INT NOT NULL,
-    staffid INT NULL,
+    staffuserid INT NULL,
     PRIMARY KEY (id),
-    INDEX staffid_idx (staffid ASC),
+    INDEX staffid_idx (staffuserid ASC),
     CONSTRAINT subject_fk1
       FOREIGN KEY (classid)
       REFERENCES ams.class (id)
       ON DELETE CASCADE
       ON UPDATE NO ACTION,
     CONSTRAINT subject_fk2
-      FOREIGN KEY (staffid)
-      REFERENCES ams.staff (id)
+      FOREIGN KEY (staffuserid)
+      REFERENCES ams.user (id)
       ON DELETE SET NULL
       ON UPDATE NO ACTION)
   ENGINE = InnoDB;`
@@ -108,45 +134,23 @@ connection.query(createSubject, function (err, result) {
     if (err) throw err;
 });
 
-const createParent = `CREATE TABLE IF NOT EXISTS ams.parent (
-    id INT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(45) NOT NULL,
-    phonenumber INT NOT NULL,
-    email VARCHAR(45) NOT NULL,
-    address VARCHAR(45) NOT NULL,
-    age INT NOT NULL,
-    gender VARCHAR(45) NOT NULL,
-    institutionid INT NOT NULL,
-    PRIMARY KEY (id),
-    INDEX instituionid_idx (institutionid ASC),
-    CONSTRAINT parent_fk1
-      FOREIGN KEY (institutionid)
-      REFERENCES ams.institution (id)
-      ON DELETE CASCADE
-      ON UPDATE NO ACTION)
-  ENGINE = InnoDB;`
-
-connection.query(createParent, function (err, result) {
-    if (err) throw err;
-});
-
 const createParentStudentMapping = `CREATE TABLE IF NOT EXISTS ams.parentstudentmapping (
     id INT NOT NULL AUTO_INCREMENT,
-    parentid INT NOT NULL,
-    studentid INT NOT NULL,
+    parentuserid INT NOT NULL,
+    studentuserid INT NOT NULL,
     institutionid INT NOT NULL,
     PRIMARY KEY (id),
-    INDEX parentid_idx (parentid ASC),
+    INDEX parentid_idx (parentuserid ASC),
     INDEX institutionid_idx (institutionid ASC),
-    INDEX studentid_idx (studentid ASC),
+    INDEX studentid_idx (studentuserid ASC),
     CONSTRAINT parentstudentmapping_fk1
-      FOREIGN KEY (parentid)
-      REFERENCES ams.parent (id)
+      FOREIGN KEY (parentuserid)
+      REFERENCES ams.user (id)
       ON DELETE CASCADE
       ON UPDATE NO ACTION,
     CONSTRAINT parentstudentmapping_fk2
-      FOREIGN KEY (studentid)
-      REFERENCES ams.student (id)
+      FOREIGN KEY (studentuserid)
+      REFERENCES ams.user (id)
       ON DELETE CASCADE
       ON UPDATE NO ACTION,
     CONSTRAINT parentstudentmapping_fk3
@@ -155,33 +159,9 @@ const createParentStudentMapping = `CREATE TABLE IF NOT EXISTS ams.parentstudent
       ON DELETE CASCADE
       ON UPDATE NO ACTION)
   ENGINE = InnoDB;`
-
-
 connection.query(createParentStudentMapping, function (err, result) {
     if (err) throw err;
 });
-
-const createAdmin = `CREATE TABLE IF NOT EXISTS ams.admin (
-    id INT NOT NULL ,
-    name VARCHAR(45) NOT NULL,
-    age INT NOT NULL,
-    phonenumber INT NOT NULL,
-    address VARCHAR(45) NOT NULL,
-    institutionid INT NOT NULL,
-    email VARCHAR(45) NOT NULL,
-    PRIMARY KEY (id, name),
-    INDEX institutionid_idx (institutionid ASC),
-    CONSTRAINT admin_fk1
-      FOREIGN KEY (institutionid)
-      REFERENCES ams.institution (id)
-      ON DELETE CASCADE
-      ON UPDATE NO ACTION)
-  ENGINE = InnoDB;
-  `
-
-connection.query(createAdmin, function (err, result) {
-    if (err) throw err;
-})
 
 const createTimetable = `CREATE TABLE IF NOT EXISTS ams.timetable (
     id INT NOT NULL ,
@@ -219,14 +199,14 @@ const createAttendance = `CREATE TABLE IF NOT EXISTS ams.attendance (
     id INT NOT NULL ,
     timetableid INT NULL,
     date DATE NOT NULL,
-    studentid INT NOT NULL,
+    studentuserid INT NOT NULL,
     institutionid INT NOT NULL,
     day INT NOT NULL,
     hour INT NOT NULL,
     subjectid INT NULL,
     classid INT NULL,
     PRIMARY KEY (id),
-    INDEX studentid_idx (studentid ASC),
+    INDEX studentid_idx (studentuserid ASC),
     INDEX institutionid_idx (institutionid ASC),
     INDEX timetableid_idx (timetableid ASC),
     INDEX attendance_fk4_idx (subjectid ASC),
@@ -237,8 +217,8 @@ const createAttendance = `CREATE TABLE IF NOT EXISTS ams.attendance (
       ON DELETE SET NULL
       ON UPDATE NO ACTION,
     CONSTRAINT attendance_fk2
-      FOREIGN KEY (studentid)
-      REFERENCES ams.student (id)
+      FOREIGN KEY (studentuserid)
+      REFERENCES ams.user (id)
       ON DELETE CASCADE
       ON UPDATE NO ACTION,
     CONSTRAINT attendance_fk3
@@ -264,14 +244,14 @@ connection.query(createAttendance, function (err, result) {
 
 const createStudentClassMapping = `CREATE TABLE IF NOT EXISTS ams.studentclassmapping (
     id INT NOT NULL,
-    studentid INT NOT NULL,
+    studentuserid INT NOT NULL,
     classid INT NOT NULL,
     PRIMARY KEY (id),
-    INDEX studentclassmapping_fk1_idx (studentid ASC),
+    INDEX studentclassmapping_fk1_idx (studentuserid ASC),
     INDEX studentclassmapping_fk2_idx (classid ASC),
     CONSTRAINT studentclassmapping_fk1
-      FOREIGN KEY (studentid)
-      REFERENCES ams.student (id)
+      FOREIGN KEY (studentuserid)
+      REFERENCES ams.user (id)
       ON DELETE CASCADE
       ON UPDATE NO ACTION,
     CONSTRAINT studentclassmapping_fk2
